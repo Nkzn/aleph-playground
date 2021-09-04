@@ -1,9 +1,22 @@
 import { useDeno } from 'aleph/react'
+import type { SSROptions } from 'aleph/types.d.ts'
 import React from 'react'
 import Logo from '~/components/logo.tsx'
 import useCounter from '~/lib/useCounter.ts'
 
-export default function Home() {
+export const ssr: SSROptions = {
+  props: async router => {
+    return {
+      $revalidate: 1, // revalidate props after 1 second
+      serverTime: Date.now()
+    }
+  },
+  paths: async () => {
+    return []
+  }
+}
+
+export default function Home(props: any) {
   const [count, isSyncing, increase, decrease] = useCounter()
   const version = useDeno(() => Deno.version.deno)
 
@@ -36,6 +49,7 @@ export default function Home() {
         <button onClick={increase}>+</button>
       </div>
       <p className="copyinfo">Built by Aleph.js in Deno {version}</p>
+      <p>Now: {props.serverTime}</p>
     </div>
   )
 }
